@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Admin | Exun 2018</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" media="screen" href="/skeleton.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="/admin/index.css" />
+</head>
+
+<body>
+  <div id="app">
+    <div class="wrapper">
+      <div class="colorline"></div>
+      <div class="content container">
+        <h1>Admin</h1>
+        <div class="row">
+          <div class="one-third column">
+            <div class="card no-padding">
+              <div class="padded">
+                <h2>Users</h2>
+              </div>
+              <div class="user-list">
+                <user v-for="user in users" :key="user.id " :email="user.email"></user>
+              </div>
+              <div class="padded" style="display: flex;justify-content: center; align-items: center;">
+                <button class="inline-block">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="two-thirds column ">
+            <post-form></post-form>
+            <post v-for="post in posts " :key="post.id " :title="post.title " :body="post.body "></post>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js "></script>
+<script src="/admin/index.js "></script>
+
+</html>
