@@ -1,5 +1,5 @@
-const db = require('../../config/db');
-const auth = require('../../config/auth');
+const db = require('../../lib/db');
+const auth = require('../../lib/auth');
 const Router = require('koa-router');
 const router = new Router({
   prefix: '/posts',

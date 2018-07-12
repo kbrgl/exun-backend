@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const auth = require('../../config/auth');
+const auth = require('../../lib/auth');
 
 const router = new Router({
   prefix: '/admin',
