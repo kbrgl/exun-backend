@@ -23,4 +23,25 @@ router.post('/', auth.middleware.ensure(), async ctx => {
   };
 });
 
+router.del('/:id', auth.middleware.ensure(), async ctx => {
+  const { id } = ctx.params;
+  await db('posts')
+    .where('id', id)
+    .del();
+  ctx.body = {
+    ok: true,
+  };
+});
+
+router.patch('/:id', auth.middleware.ensure(), async ctx => {
+  const { id } = ctx.params;
+  const { title, body } = ctx.request.body;
+  await db('posts')
+    .where('id', id)
+    .update({ title, body });
+  ctx.body = {
+    ok: true,
+  };
+});
+
 module.exports = router;

@@ -12,6 +12,6 @@ router.get('/', ctx => {
 });
 
 router.use(require('./posts').routes());
-router.use(require('./users').routes());
+router.use(require('./admins').routes());
 
 module.exports = router;
