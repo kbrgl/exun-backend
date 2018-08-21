@@ -153,12 +153,24 @@ Vue.component('admin-list', {
   methods: {
     add: function(event) {
       event.preventDefault();
+      const email = window.prompt('Enter email');
+      if (!email) {
+        return;
+      }
+      const password = window.prompt('Set a password');
+      if (!password) {
+        return;
+      }
       const data = {
-        email: window.prompt('Enter email'),
-        password: window.prompt('Set a password'),
+        email,
+        password,
       };
-      while (window.prompt('Confirm password') !== data.password) {
-        window.alert('Wrong password, try again.');
+      let confirmation = window.prompt('Confirm password')
+      while (confirmation !== data.password) {
+        if (!confirmation) {
+          return
+        }
+        confirmation = window.prompt('Wrong password, try again');
       }
       fetch(url('admins'), {
         method: 'POST',
