@@ -9,7 +9,9 @@ const config = require('./config');
 
 const app = new Koa();
 
-app.use(logger());
+if (app.env === 'development') {
+  app.use(logger());
+}
 app.use(bodyparser());
 app.use(views(`${__dirname}/views`));
 app.use(router.routes());
