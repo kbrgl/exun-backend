@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
+const dotenv = require('dotenv');
+dotenv.load();
 const server = require('../server');
-const config = require('../config');
 
-const { port } = config;
+const port = process.env.PORT || 3000;
 
 server.listen(port, () => {
   console.log(`Listening on :${port}`);

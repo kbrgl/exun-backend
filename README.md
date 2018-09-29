@@ -1,12 +1,10 @@
 Works in conjunction with Exun app, but you can run this repo independently.
 
 # Setup
-1. Clone repo and create a file in repo root called config.json
-  ```json
-  {
-    "secret": "<YOUR SECRET HERE>",
-    "port": 3000
-  }
+1. Clone repo and create a file in repo root called `.env`.
+  ```
+  PORT=3000
+  DATABASE_URL=<database URL>
   ```
 2. Install MySQL. The application expects the following setup:
   * Username: `root`

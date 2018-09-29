@@ -5,7 +5,6 @@ const views = require('koa-views');
 const static = require('koa-static');
 const logger = require('koa-logger');
 const router = require('./routes');
-const config = require('./config');
 
 const app = new Koa();
 

@@ -12,6 +12,7 @@
   "dependencies": {
     "basic-auth": "^2.0.0",
     "bcrypt": "^3.0.0",
+    "dotenv": "^6.0.0",
     "knex": "^0.14.6",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",
