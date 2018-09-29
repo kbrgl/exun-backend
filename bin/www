@@ -6,5 +6,5 @@ const config = require('../config');
 const { port } = config;
 
 server.listen(port, () => {
-  console.log(`🎉 Listening on port ${port}`);
+  console.log(`Listening on :${port}`);
 });
