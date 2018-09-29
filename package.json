@@ -9,6 +9,9 @@
   },
   "author": "Kabir Goel",
   "license": "MIT",
+  "engines": {
+    "node": "10.11.x"
+  },
   "dependencies": {
     "basic-auth": "^2.0.0",
     "bcrypt": "^3.0.0",
