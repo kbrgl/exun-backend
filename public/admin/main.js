@@ -1,4 +1,8 @@
+/* eslint-disable no-alert */
+/* globals Vue: false, marked: false */
+
 function debug(message) {
+  // eslint-disable-next-line no-console
   console.log(`[debug] ${message}`);
 }
 
@@ -25,7 +29,7 @@ Vue.component('post', {
   `,
   methods: {
     marked,
-    timestamps: function() {
+    timestamps() {
       const c = new Date(this.post.created_at);
       const u = new Date(this.post.updated_at);
       let res = `Posted ${this.format(c)}`;
@@ -34,10 +38,10 @@ Vue.component('post', {
       }
       return res;
     },
-    format: function(date) {
+    format(date) {
       return date.toLocaleString('en-US');
     },
-    del: function(event) {
+    del(event) {
       event.preventDefault();
       if (!window.confirm(`Are you sure you want to delete post '${this.post.title}'?`)) {
         return;
@@ -66,24 +70,39 @@ Vue.component('post-form', {
     title: '',
     body: '',
     error: '',
+    shouldNotify: false,
+    isTest: false,
+    shouldPost: true,
   }),
   template: `
   <form>
+    <p class="error" v-if="error.trim() != ''">{{ error }}</p>
     <input type="text" placeholder="Title" v-model="title">
     <br>
     <br>
-    <textarea placeholder="Body" name="body" v-model="body"></textarea>
+    <textarea placeholder="Body" v-model="body"></textarea>
     <br>
-    <button class="button-primary" @click="post">Post</button>
-    <p class="error">{{ error }}</p>
+    <div>
+      <input type="checkbox" v-model="shouldPost"> Post &nbsp;
+      <input type="checkbox" v-model="shouldNotify"> Notify &nbsp;
+      <span v-if="shouldNotify"><input type="checkbox" v-model="isTest"> Test</span>
+    </div>
+    <button class="button-primary" @click="post">Publish</button>
   </form>
   `,
   methods: {
-    post: function(event) {
+    post(event) {
       event.preventDefault();
+      if (!(this.$data.shouldPost || this.$data.shouldNotify)) {
+        this.$data.error = 'No action selected';
+        return;
+      }
       const data = {
-        title: this.title,
-        body: this.body,
+        title: this.$data.title,
+        body: this.$data.body,
+        shouldPost: this.$data.shouldPost,
+        shouldNotify: this.$data.shouldNotify,
+        isTest: this.$data.shouldNotify ? this.$data.isTest : false,
       };
       fetch(url('posts'), {
         method: 'POST',
@@ -96,12 +115,16 @@ Vue.component('post-form', {
         .then(res => res.json())
         .then(async res => {
           if (res.ok) {
-            this.title = '';
-            this.body = '';
+            this.$data.title = '';
+            this.$data.body = '';
+            this.$data.shouldPost = false;
+            this.$data.shouldNotify = false;
+            this.$data.isTest = false;
+            this.$data.error = '';
             debug('post posted');
             app.posts = await app.fetchPosts();
           } else {
-            this.error = res.message;
+            this.$data.error = res.message;
             debug(`error during post: ${res.message}`);
           }
         });
@@ -120,7 +143,7 @@ Vue.component('admin', {
     </div>
   `,
   methods: {
-    del: function(event) {
+    del(event) {
       event.preventDefault();
       if (!window.confirm(`Are you sure you want to delete admin '${this.admin.email}'?`)) {
         return;
@@ -151,7 +174,7 @@ Vue.component('admin-list', {
     </div>
   `,
   methods: {
-    add: function(event) {
+    add(event) {
       event.preventDefault();
       const email = window.prompt('Enter email');
       if (!email) {
@@ -165,10 +188,10 @@ Vue.component('admin-list', {
         email,
         password,
       };
-      let confirmation = window.prompt('Confirm password')
+      let confirmation = window.prompt('Confirm password');
       while (confirmation !== data.password) {
         if (!confirmation) {
-          return
+          return;
         }
         confirmation = window.prompt('Wrong password, try again');
       }
@@ -200,17 +223,17 @@ let app = new Vue({
     posts: [],
     admins: [],
   },
-  created: async function() {
+  async created() {
     this.posts = await this.fetchPosts();
     this.admins = await this.fetchAdmins();
   },
   methods: {
-    fetchPosts: async function() {
+    async fetchPosts() {
       const res = await fetch(url('posts'));
       const json = await res.json();
       return json.posts;
     },
-    fetchAdmins: async function() {
+    async fetchAdmins() {
       const res = await fetch(url('admins'), { credentials: 'include' });
       const json = await res.json();
       return json.admins;

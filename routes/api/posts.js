@@ -1,6 +1,9 @@
+const Router = require('koa-router');
+
 const db = require('../../lib/db');
 const auth = require('../../lib/auth');
-const Router = require('koa-router');
+const notifications = require('../../lib/notifications');
+
 const router = new Router({
   prefix: '/posts',
 });
@@ -16,8 +19,39 @@ router.get('/', async ctx => {
 });
 
 router.post('/', auth.middleware.ensure(), async ctx => {
-  const { title, body } = ctx.request.body;
-  await db('posts').insert({ title, body });
+  const { title, body, shouldPost, shouldNotify, isTest } = ctx.request.body;
+  // Sanity check for isTest: if it's neither true nor false (e.g. it's undefined)
+  // then make it true.
+  // Cautious approach ensures
+  if (isTest !== true && isTest !== false) {
+    ctx.status = 400;
+    ctx.body = {
+      ok: false,
+      message: `'isTest' parameter is neither true nor false, this is most likely a problem with the admin`,
+    };
+    return;
+  }
+  try {
+    if (shouldPost) {
+      await db('posts').insert({ title, body });
+    }
+    if (shouldNotify) {
+      await notifications.push(
+        title,
+        body,
+        // The following uses negation to ensure an undefined isTest parameter
+        // does not cause a notification to be sent to all users.
+        isTest ? [notifications.segments.TEST] : [notifications.segments.ALL],
+      );
+    }
+  } catch (err) {
+    ctx.status = 500;
+    ctx.body = {
+      ok: false,
+      message: `${err.name}: ${err.message}`,
+    };
+    return;
+  }
   ctx.body = {
     ok: true,
   };
