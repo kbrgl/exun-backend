@@ -28,8 +28,11 @@ h2 {
 }
 
 .error {
-  padding-top: 4px;
-  color: rgb(243, 85, 85);
+  padding-top: 5px;
+  background-color: rgb(243, 85, 85);
+  color: #fff;
+  padding: 20px;
+  font-weight: bold;
 }
 
 .admin {
