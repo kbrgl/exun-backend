@@ -1,7 +1,9 @@
-const db = require('../../lib/db');
-const auth = require('../../lib/auth');
 const Router = require('koa-router');
 const bcrypt = require('bcrypt');
+
+const db = require('../../lib/db');
+const auth = require('../../lib/auth');
+
 const router = new Router({
   prefix: '/admins',
 });
@@ -9,7 +11,7 @@ const router = new Router({
 router.use(auth.middleware.ensure());
 
 router.get('/', async ctx => {
-  let query = db('admins')
+  const query = db('admins')
     .select('*')
     .orderBy('email', 'asc');
   const admins = await query;
