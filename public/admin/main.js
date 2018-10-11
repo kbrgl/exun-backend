@@ -22,7 +22,8 @@ Vue.component('post', {
     <h2>{{ post.title }}</h2>
     <p v-html="marked(post.body)"></p>
     <div class="post-metadata">
-      {{ timestamps() }}
+      {{ timestamps() }}<br>
+      ID: {{ post.id }}
     </div>
     <a href="#" class="button" @click="del">{{ deleteButtonText }}</a>
   </div>
@@ -67,6 +68,7 @@ Vue.component('post', {
 
 Vue.component('post-form', {
   data: () => ({
+    id: null,
     title: '',
     body: '',
     error: '',
@@ -77,12 +79,15 @@ Vue.component('post-form', {
   template: `
   <form>
     <p class="error" v-if="error.trim() != ''">{{ error }}</p>
+    <input type="number" placeholder="ID (only for editing existing post)" v-model="id">
+    <br>
+    <br>
     <input type="text" placeholder="Title" v-model="title">
     <br>
     <br>
     <textarea placeholder="Body" v-model="body"></textarea>
     <br>
-    <div>
+    <div v-if="!id">
       <input type="checkbox" v-model="shouldPost"> Post &nbsp;
       <input type="checkbox" v-model="shouldNotify"> Notify &nbsp;
       <span v-if="shouldNotify"><input type="checkbox" v-model="isTest"> Test</span>
@@ -97,15 +102,21 @@ Vue.component('post-form', {
         this.$data.error = 'No action selected';
         return;
       }
-      const data = {
-        title: this.$data.title,
-        body: this.$data.body,
+      const newPostData = {
         shouldPost: this.$data.shouldPost,
         shouldNotify: this.$data.shouldNotify,
         isTest: this.$data.shouldNotify ? this.$data.isTest : false,
       };
-      fetch(url('posts'), {
-        method: 'POST',
+      let data = {
+        title: this.$data.title,
+        body: this.$data.body,
+      };
+      if (!this.$data.id) {
+        data = Object.assign(data, newPostData);
+      }
+      const idUrl = this.$data.id ? `/${this.$data.id}` : '';
+      fetch(url(`posts${idUrl}`), {
+        method: this.$data.id ? 'PATCH' : 'POST',
         body: JSON.stringify(data),
         headers: new Headers({
           'Content-Type': 'application/json',
