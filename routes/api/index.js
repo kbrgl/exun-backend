@@ -13,5 +13,6 @@ router.get('/', ctx => {
 
 router.use(require('./posts').routes())
 router.use(require('./admins').routes())
+router.use(require('./auth').routes())
 
 module.exports = router

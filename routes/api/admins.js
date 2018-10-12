@@ -1,14 +1,14 @@
 const Router = require('koa-router')
 const bcrypt = require('bcrypt')
 
-const db = require('../../lib/db')
 const auth = require('../../lib/auth')
+const db = require('../../lib/db')
 
 const router = new Router({
   prefix: '/admins',
 })
 
-router.use(auth.middleware.ensure())
+router.use(auth.jwt())
 
 router.get('/', async ctx => {
   const query = db('admins')
@@ -24,9 +24,14 @@ router.get('/', async ctx => {
 router.post('/', async ctx => {
   const { email, password } = ctx.request.body
   const hash = await bcrypt.hash(password, 10)
-  await db('admins').insert({ email, password: hash })
+  const [id] = await db('admins').insert({ email, password: hash })
+  const admin = await db('admins')
+    .select('*')
+    .where('id', id)
+    .first()
   ctx.body = {
     ok: true,
+    admin,
   }
 })
 

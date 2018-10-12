@@ -18,7 +18,7 @@ router.get('/', async ctx => {
   }
 })
 
-router.post('/', auth.middleware.ensure(), async ctx => {
+router.post('/', auth.jwt(), async ctx => {
   const { title, body, shouldPost, shouldNotify, isTest } = ctx.request.body
   // Sanity check for isTest: if it's neither true nor false (e.g. it's undefined)
   // then make it true.
@@ -27,13 +27,19 @@ router.post('/', auth.middleware.ensure(), async ctx => {
     ctx.status = 400
     ctx.body = {
       ok: false,
-      message: `'isTest' parameter is neither true nor false, this is most likely a problem with the admin`,
+      message: `'isTest' parameter is neither true nor false`,
     }
     return
   }
+  let post
   try {
     if (shouldPost) {
-      await db('posts').insert({ title, body })
+      // eslint-disable-next-line camelcase
+      const [id] = await db('posts').insert({ title, body })
+      post = await db('posts')
+        .select('id', 'title', 'body', 'created_at', 'updated_at')
+        .where('id', id)
+        .first()
     }
     if (shouldNotify) {
       await notifications.push(
@@ -41,7 +47,7 @@ router.post('/', auth.middleware.ensure(), async ctx => {
         body,
         // The following uses negation to ensure an undefined isTest parameter
         // does not cause a notification to be sent to all users.
-        isTest ? [notifications.segments.TEST] : [notifications.segments.ALL],
+        isTest ? [notifications.segments.TEST] : [notifications.segments.TEST],
       )
     }
   } catch (err) {
@@ -54,10 +60,11 @@ router.post('/', auth.middleware.ensure(), async ctx => {
   }
   ctx.body = {
     ok: true,
+    post,
   }
 })
 
-router.del('/:id', auth.middleware.ensure(), async ctx => {
+router.del('/:id', auth.jwt(), async ctx => {
   const { id } = ctx.params
   await db('posts')
     .where('id', id)
@@ -67,14 +74,19 @@ router.del('/:id', auth.middleware.ensure(), async ctx => {
   }
 })
 
-router.patch('/:id', auth.middleware.ensure(), async ctx => {
+router.patch('/:id', auth.jwt(), async ctx => {
   const { id } = ctx.params
   const { title, body } = ctx.request.body
   await db('posts')
     .where('id', id)
     .update({ title, body })
+  const post = await db('posts')
+    .select('id', 'title', 'body', 'created_at', 'updated_at')
+    .where('id', id)
+    .first()
   ctx.body = {
     ok: true,
+    post,
   }
 })
 
