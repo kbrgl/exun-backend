@@ -18,8 +18,8 @@ if (app.env === 'development') {
 app.use(bodyparser())
 app.use(passport.initialize())
 app.use(views(`${__dirname}/views`))
-app.use(router.routes())
 app.use(serve('public'))
+app.use(router.routes())
 
 const server = http.createServer(app.callback())
 module.exports = server
