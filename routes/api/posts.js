@@ -47,7 +47,7 @@ router.post('/', auth.jwt(), async ctx => {
         body,
         // The following uses negation to ensure an undefined isTest parameter
         // does not cause a notification to be sent to all users.
-        isTest ? [notifications.segments.TEST] : [notifications.segments.TEST],
+        isTest ? [notifications.segments.TEST] : [notifications.segments.ALL],
       )
     }
   } catch (err) {
