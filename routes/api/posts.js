@@ -11,7 +11,7 @@ const router = new Router({
 router.get('/', async ctx => {
   const posts = await db('posts')
     .select('id', 'title', 'body', 'created_at', 'updated_at')
-    .orderBy('updated_at', 'desc')
+    .orderBy('created_at', 'desc')
   ctx.body = {
     ok: true,
     posts,
